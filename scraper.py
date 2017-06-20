@@ -14,8 +14,8 @@ class cralwer:
         self.counter = 0
         self.m_id, self.date, self.conditions, self.team1, self.team2, self.toss, self.winner, self.margin, self.ground, self.team1_total, \
             self.team2_total,self.team1_rpo, self.team2_rpo, self.team1_avg_sr, self.team2_avg_sr, self.team1_avg_ecn, self.team2_avg_ecn, \
-            self.team1_wickets, self.team2_wickets, self.team1_maiden, self.team2_maiden, self.team1_6s, self.team2_6s, self.team1_4s, self.team2_4s, self.year = \
-            ([] for i in range(26))
+            self.team1_wickets, self.team2_wickets, self.team1_maiden, self.team2_maiden, self.team1_6s, self.team2_6s, self.team1_4s, self.team2_4s = \
+            ([] for i in range(25))
 
 
     def start(self):
@@ -23,7 +23,6 @@ class cralwer:
             payload = {'class' : 3, 'id' : yr, 'type' : 'year'}
             r = requests.get("http://stats.espncricinfo.com/ci/engine/records/team/match_results.html", params=payload)
             html = r.text
-            self.year.append(yr)
             self.__bs_extract(html)
             time.sleep(5)
 
@@ -53,6 +52,11 @@ class cralwer:
         spans = soup.find('div', {'class' : 'space-top-bottom-10'}).findAll('span', {'class' : 'normal'})
         self.toss.append(spans[0].text.strip())
         self.ground.append(soup.select('div.large-7.medium-7.columns.text-right.match-information')[0].findAll('div', {'class' : 'space-top-bottom-5'})[1].find('a').text.strip())
+        cond = soup.select('div.row.brief-summary')[0].select('div.medium-7')[0].select('div.space-top-bottom-5')[2].text.strip().split(' - ')
+        if len(cond) > 1:
+            self.conditions.append(cond[1].split(' ')[0])
+        else:
+            self.conditions.append('?')
         batting_tables = soup.find('div', {'class' : 'full-scorecard-block'}).select('div.row')[2].select('div.large.20.columns')[0].findAll('table', {'class' : 'batting-table'})
         bowling_tables = soup.find('div', {'class' : 'full-scorecard-block'}).select('div.row')[2].select('div.large.20.columns')[0].findAll('table', {'class' : 'bowling-table'})
         tr = batting_tables[0].find('tr').findAll('th')
@@ -187,5 +191,11 @@ class cralwer:
 if __name__ == '__main__':
     c = cralwer()
     c.start()
-
-    matches = pd.DataFrame({'m_id' : c.m_id. ''})
+    print(vars(c))
+    matches = pd.DataFrame({'m_id' : c.m_id, 'date': c.date, 'conditions': c.conditions,
+                            'team1': c.team1, 'team2': c.team2, 'toss' : c.toss, 'winner' : c.winner,
+                            'margin' : c.margin, 'ground' : c.ground, 'team1_total' : c.team1_total,
+                            'team2_total' : c.team2_total, 'team1_runs_per_over' : c.team1_rpo, 'team2_runs_per_over' : c.team2_rpo,
+                            'team1_avg_sr' : c.team1_avg_sr, 'team2_avg_sr' : c.team2_avg_sr, 'team1_avg_ecn': c.team1_avg_ecn,
+                            'team2_avg_ecn' : c.team2_avg_ecn, 'team1_maidens' : c.team1_maiden, 'team2_maidens' : c.team2_maiden,
+                            'team1_6s' : c.team1_6s, 'team2_6s' : c.team2_6s, 'team1_4s' : c.team1_4s, 'team2_4s' : c.team2_4s})
