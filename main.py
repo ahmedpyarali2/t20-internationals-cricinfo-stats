@@ -1,9 +1,10 @@
 # coding=utf-8
 
 from scraper import crawler
+import pandas as pd
 
 if __name__ == '__main__':
-    c = cralwer()
+    c = crawler()
     c.start()
     print(vars(c))
     matches = pd.DataFrame({'m_id' : c.m_id, 'date': c.date, 'conditions': c.conditions,
