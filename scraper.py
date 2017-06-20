@@ -10,7 +10,7 @@ import time
 class cralwer:
     def __init__(self):
         self.home = 'http://stats.espncricinfo.com'
-        self.years = np.arange(2005, 2006)
+        self.years = np.arange(2005, 2018)
         self.counter = 0
         self.m_id, self.date, self.conditions, self.team1, self.team2, self.toss, self.winner, self.margin, self.ground, self.team1_total, \
             self.team2_total,self.team1_rpo, self.team2_rpo, self.team1_avg_sr, self.team2_avg_sr, self.team1_avg_ecn, self.team2_avg_ecn, \
@@ -32,14 +32,15 @@ class cralwer:
         for row in table.findAll('tr'):
             cols = row.findAll('td')
             print("Match ID: " + str(self.counter))
-            self.m_id.append(self.counter)
+            if cols[3].text.strip() != '':
+                self.m_id.append(self.counter)
+                self.team1.append(cols[0].text.strip())
+                self.team2.append(cols[1].text.strip())
+                self.winner.append(cols[2].text.strip())
+                self.margin.append(cols[3].text.strip())
+                self.date.append(cols[5].text.strip())
+                self.__fetch_scoreboard(self.home + cols[6].find('a')['href'])
             self.counter += 1
-            self.team1.append(cols[0].text.strip())
-            self.team2.append(cols[1].text.strip())
-            self.winner.append(cols[2].text.strip())
-            self.margin.append(cols[3].text.strip())
-            self.date.append(cols[5].text.strip())
-            self.__fetch_scoreboard(self.home + cols[6].find('a')['href'])
             time.sleep(2)
 
     def __fetch_scoreboard(self, href):
@@ -62,22 +63,28 @@ class cralwer:
         tr = batting_tables[0].find('tr').findAll('th')
         if t1.lower() not in tr[1].text.strip().lower():
             table = batting_tables[1]
-            self.team1_total.append(int(table.findAll('tr')[-1].findAll('td')[3].text))
+            self.team1_total.append(float(table.findAll('tr')[-1].findAll('td')[3].text))
             self.team1_rpo.append(float(table.findAll('tr')[-1].findAll('td')[4].text.strip().split('(')[1].split(' ')[0]))
             t1_wickets = (table.findAll('tr')[-1].findAll('td')[2].text.strip().split('(')[1].split(';')[0])
             if t1_wickets == 'all out':
                 self.team1_wickets.append(10)
             else:
-                self.team1_wickets.append(int(t1_wickets.split(' ')[0]))
+                self.team1_wickets.append(float(t1_wickets.split(' ')[0]))
             tr = table.findAll('tr', {'class' : None})
             for row in tr:
                 cols = row.findAll('td')
-                t1_4 += int(cols[6].text)
-                t1_6 += int(cols[7].text)
-                if (cols[8].text == '-'):
-                        t1_sr.append(0)
-                else:
-                    t1_sr.append(float(cols[8].text))
+                t1_4 += float(cols[6].text)
+                t1_6 += float(cols[7].text)
+                try:
+                    if (cols[8].text == '-'):
+                            t1_sr.append(0)
+                    else:
+                        t1_sr.append(float(cols[8].text))
+                except:
+                    if (cols[7].text == '-'):
+                            t1_sr.append(0)
+                    else:
+                        t1_sr.append(float(cols[7].text))
 
             self.team1_4s.append(t1_4)
             self.team1_6s.append(t1_6)
@@ -86,29 +93,35 @@ class cralwer:
             tr = table.findAll('tr', {'class' : None})
             for row in tr:
                 cols = row.findAll('td')
-                t1_maid += int(cols[3].text)
+                t1_maid += float(cols[3].text)
                 t1_ecn.append(float(cols[6].text))
 
             self.team1_maiden.append(t1_maid)
             self.team1_avg_ecn.append(sum(t1_ecn) / len(t1_ecn))
 
             table = batting_tables[0]
-            self.team2_total.append(int(table.findAll('tr')[-1].findAll('td')[3].text))
+            self.team2_total.append(float(table.findAll('tr')[-1].findAll('td')[3].text))
             self.team2_rpo.append(float(table.findAll('tr')[-1].findAll('td')[4].text.strip().split('(')[1].split(' ')[0]))
             t2_wickets = (table.findAll('tr')[-1].findAll('td')[2].text.strip().split('(')[1].split(';')[0])
             if t2_wickets == 'all out':
                 self.team1_wickets.append(10)
             else:
-                self.team2_wickets.append(int(t2_wickets.split(' ')[0]))
+                self.team2_wickets.append(float(t2_wickets.split(' ')[0]))
             tr = table.findAll('tr', {'class' : None})
             for row in tr:
                 cols = row.findAll('td')
-                t2_4 += int(cols[6].text)
-                t2_6 += int(cols[7].text)
-                if (cols[8].text == '-'):
-                        t2_sr.append(0)
-                else:
-                    t2_sr.append(float(cols[8].text))
+                t2_4 += float(cols[6].text)
+                t2_6 += float(cols[7].text)
+                try:
+                    if (cols[8].text == '-'):
+                            t2_sr.append(0)
+                    else:
+                        t2_sr.append(float(cols[8].text))
+                except:
+                    if (cols[7].text == '-'):
+                            t2_sr.append(0)
+                    else:
+                        t2_sr.append(float(cols[7].text))
 
             self.team2_4s.append(t2_4)
             self.team2_6s.append(t2_6)
@@ -117,7 +130,7 @@ class cralwer:
             tr = table.findAll('tr', {'class' : None})
             for row in tr:
                 cols = row.findAll('td')
-                t2_maid += int(cols[3].text)
+                t2_maid += float(cols[3].text)
                 t2_ecn.append(float(cols[6].text))
 
             self.team2_maiden.append(t2_maid)
@@ -125,22 +138,28 @@ class cralwer:
 
         else:
             table = batting_tables[0]
-            self.team1_total.append(int(table.findAll('tr')[-1].findAll('td')[3].text))
+            self.team1_total.append(float(table.findAll('tr')[-1].findAll('td')[3].text))
             self.team1_rpo.append(float(table.findAll('tr')[-1].findAll('td')[4].text.strip().split('(')[1].split(' ')[0]))
             t1_wickets = (table.findAll('tr')[-1].findAll('td')[2].text.strip().split('(')[1].split(';')[0])
             if t1_wickets == 'all out':
                 self.team1_wickets.append(10)
             else:
-                self.team1_wickets.append(int(t1_wickets.split(' ')[0]))
+                self.team1_wickets.append(float(t1_wickets.split(' ')[0]))
             tr = table.findAll('tr', {'class' : None})
             for row in tr:
                 cols = row.findAll('td')
-                t1_4 += int(cols[6].text)
-                t1_6 += int(cols[7].text)
-                if (cols[8].text == '-'):
-                        t1_sr.append(0)
-                else:
-                    t1_sr.append(float(cols[8].text))
+                t1_4 += float(cols[6].text)
+                t1_6 += float(cols[7].text)
+                try:
+                    if (cols[8].text == '-'):
+                            t1_sr.append(0)
+                    else:
+                        t1_sr.append(float(cols[8].text))
+                except:
+                    if (cols[7].text == '-'):
+                            t1_sr.append(0)
+                    else:
+                        t1_sr.append(float(cols[7].text))
 
 
             self.team1_4s.append(t1_4)
@@ -150,29 +169,35 @@ class cralwer:
             tr = table.findAll('tr', {'class' : None})
             for row in tr:
                 cols = row.findAll('td')
-                t1_maid += int(cols[3].text)
+                t1_maid += float(cols[3].text)
                 t1_ecn.append(float(cols[6].text))
 
             self.team1_maiden.append(t1_maid)
             self.team1_avg_ecn.append(sum(t1_ecn) / len(t1_ecn))
 
             table = batting_tables[1]
-            self.team2_total.append(int(table.findAll('tr')[-1].findAll('td')[3].text))
+            self.team2_total.append(float(table.findAll('tr')[-1].findAll('td')[3].text))
             self.team2_rpo.append(float(table.findAll('tr')[-1].findAll('td')[4].text.strip().split('(')[1].split(' ')[0]))
             t2_wickets = (table.findAll('tr')[-1].findAll('td')[2].text.strip().split('(')[1].split(';')[0])
             if t2_wickets == 'all out':
                 self.team2_wickets.append(10)
             else:
-                self.team2_wickets.append(int(t2_wickets.split(' ')[0]))
+                self.team2_wickets.append(float(t2_wickets.split(' ')[0]))
             tr = table.findAll('tr', {'class' : None})
             for row in tr:
                 cols = row.findAll('td')
-                t2_4 += int(cols[6].text)
-                t2_6 += int(cols[7].text)
-                if (cols[8].text == '-'):
-                        t2_sr.append(0)
-                else:
-                    t2_sr.append(float(cols[8].text))
+                t2_4 += float(cols[6].text)
+                t2_6 += float(cols[7].text)
+                try:
+                    if (cols[8].text == '-'):
+                            t2_sr.append(0)
+                    else:
+                        t2_sr.append(float(cols[8].text))
+                except:
+                    if (cols[7].text == '-'):
+                            t2_sr.append(0)
+                    else:
+                        t2_sr.append(float(cols[7].text))
 
             self.team2_4s.append(t2_4)
             self.team2_6s.append(t2_6)
@@ -181,7 +206,7 @@ class cralwer:
             tr = table.findAll('tr', {'class' : None})
             for row in tr:
                 cols = row.findAll('td')
-                t2_maid += int(cols[3].text)
+                t2_maid += float(cols[3].text)
                 t2_ecn.append(float(cols[6].text))
 
             self.team2_maiden.append(t2_maid)
@@ -199,3 +224,9 @@ if __name__ == '__main__':
                             'team1_avg_sr' : c.team1_avg_sr, 'team2_avg_sr' : c.team2_avg_sr, 'team1_avg_ecn': c.team1_avg_ecn,
                             'team2_avg_ecn' : c.team2_avg_ecn, 'team1_maidens' : c.team1_maiden, 'team2_maidens' : c.team2_maiden,
                             'team1_6s' : c.team1_6s, 'team2_6s' : c.team2_6s, 'team1_4s' : c.team1_4s, 'team2_4s' : c.team2_4s})
+
+    columns = ['m_id', 'date', 'conditions', 'team1', 'team2', 'toss', 'winner', 'margin', 'ground', 'team1_total', 'team2_total', 'team1_runs_per_over', \
+                'team2_runs_per_over', 'team1_avg_sr', 'team2_avg_sr', 'team1_avg_ecn', 'team2_avg_ecn', 'team1_maidens', 'team2_maidens', \
+                'team1_6s', 'team2_6s', 'team1_4s', 'team2_4s']
+
+    matches.to_csv('matches.csv', columns=columns, index=False)
