@@ -2,7 +2,6 @@
 
 from bs4 import BeautifulSoup
 import numpy as np
-import pandas as pd
 import requests
 import time
 
@@ -73,18 +72,26 @@ class crawler:
             tr = table.findAll('tr', {'class' : None})
             for row in tr:
                 cols = row.findAll('td')
-                t1_4 += float(cols[6].text)
-                t1_6 += float(cols[7].text)
                 try:
-                    if (cols[8].text == '-'):
-                            t1_sr.append(0)
+                    if (cols[8].text == '-' or cols[8].text == ''):
+                        t1_sr.append(0)
                     else:
                         t1_sr.append(float(cols[8].text))
                 except:
-                    if (cols[7].text == '-'):
-                            t1_sr.append(0)
+                    if (cols[7].text == '-' or cols[7].text == ''):
+                        t1_sr.append(0)
                     else:
-                        t1_sr.append(float(cols[7].text))
+                        t1_sr.append(float(cols[7].text.strip()))
+
+                try:
+                    t1_4 += int(cols[6].text)
+                    t1_6 += int(cols[7].text)
+                except:
+                    try:
+                        t1_4 += int(cols[5].text)
+                        t1_6 += int(cols[6].text)
+                    except:
+                        pass
 
             self.team1_4s.append(t1_4)
             self.team1_6s.append(t1_6)
@@ -93,7 +100,7 @@ class crawler:
             tr = table.findAll('tr', {'class' : None})
             for row in tr:
                 cols = row.findAll('td')
-                t1_maid += float(cols[3].text)
+                t1_maid += int(cols[3].text)
                 t1_ecn.append(float(cols[6].text))
 
             self.team1_maiden.append(t1_maid)
@@ -110,18 +117,26 @@ class crawler:
             tr = table.findAll('tr', {'class' : None})
             for row in tr:
                 cols = row.findAll('td')
-                t2_4 += float(cols[6].text)
-                t2_6 += float(cols[7].text)
                 try:
-                    if (cols[8].text == '-'):
-                            t2_sr.append(0)
+                    if (cols[8].text == '-' or cols[8].text == ''):
+                        t2_sr.append(0)
                     else:
                         t2_sr.append(float(cols[8].text))
                 except:
-                    if (cols[7].text == '-'):
-                            t2_sr.append(0)
+                    if (cols[7].text == '-' or cols[7].text == ''):
+                        t2_sr.append(0)
                     else:
                         t2_sr.append(float(cols[7].text))
+
+                try:
+                    t2_4 += int(cols[6].text)
+                    t2_6 += int(cols[7].text)
+                except:
+                    try:
+                        t1_4 += int(cols[5].text)
+                        t1_6 += int(cols[6].text)
+                    except:
+                        pass
 
             self.team2_4s.append(t2_4)
             self.team2_6s.append(t2_6)
@@ -130,7 +145,7 @@ class crawler:
             tr = table.findAll('tr', {'class' : None})
             for row in tr:
                 cols = row.findAll('td')
-                t2_maid += float(cols[3].text)
+                t2_maid += int(cols[3].text)
                 t2_ecn.append(float(cols[6].text))
 
             self.team2_maiden.append(t2_maid)
@@ -148,28 +163,33 @@ class crawler:
             tr = table.findAll('tr', {'class' : None})
             for row in tr:
                 cols = row.findAll('td')
-                t1_4 += float(cols[6].text)
-                t1_6 += float(cols[7].text)
                 try:
-                    if (cols[8].text == '-'):
-                            t1_sr.append(0)
+                    if (cols[8].text == '-' or cols[8].text == ''):
+                        t1_sr.append(0)
                     else:
                         t1_sr.append(float(cols[8].text))
                 except:
-                    if (cols[7].text == '-'):
-                            t1_sr.append(0)
+                    if (cols[7].text == '-' or cols[7].text == ''):
+                        t1_sr.append(0)
                     else:
                         t1_sr.append(float(cols[7].text))
 
+                try:
+                    t1_4 += int(cols[6].text)
+                    t1_6 += int(cols[7].text)
+                except:
+                    try:
+                        t1_4 += int(cols[5].text)
+                        t1_6 += int(cols[6].text)
+                    except:
+                        pass
 
-            self.team1_4s.append(t1_4)
-            self.team1_6s.append(t1_6)
-            self.team1_avg_sr.append(sum(t1_sr) / len(t1_sr))
+
             table = bowling_tables[1]
             tr = table.findAll('tr', {'class' : None})
             for row in tr:
                 cols = row.findAll('td')
-                t1_maid += float(cols[3].text)
+                t1_maid += int(cols[3].text)
                 t1_ecn.append(float(cols[6].text))
 
             self.team1_maiden.append(t1_maid)
@@ -186,18 +206,26 @@ class crawler:
             tr = table.findAll('tr', {'class' : None})
             for row in tr:
                 cols = row.findAll('td')
-                t2_4 += float(cols[6].text)
-                t2_6 += float(cols[7].text)
                 try:
-                    if (cols[8].text == '-'):
+                    if (cols[8].text == '-' or cols[8].text == ''):
                             t2_sr.append(0)
                     else:
                         t2_sr.append(float(cols[8].text))
                 except:
-                    if (cols[7].text == '-'):
+                    if (cols[7].text == '-' or cols[7].text == ''):
                             t2_sr.append(0)
                     else:
                         t2_sr.append(float(cols[7].text))
+
+                try:
+                    t2_4 += int(cols[6].text)
+                    t2_6 += int(cols[7].text)
+                except:
+                    try:
+                        t1_4 += int(cols[5].text)
+                        t1_6 += int(cols[6].text)
+                    except:
+                        pass
 
             self.team2_4s.append(t2_4)
             self.team2_6s.append(t2_6)
@@ -206,7 +234,7 @@ class crawler:
             tr = table.findAll('tr', {'class' : None})
             for row in tr:
                 cols = row.findAll('td')
-                t2_maid += float(cols[3].text)
+                t2_maid += int(cols[3].text)
                 t2_ecn.append(float(cols[6].text))
 
             self.team2_maiden.append(t2_maid)
